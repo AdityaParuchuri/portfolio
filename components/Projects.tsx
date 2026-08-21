@@ -140,32 +140,30 @@ export default function Projects() {
       size: "large",
     },
     {
+      title: "AI Powered Survey Bot",
+      description:
+        "A conversational survey bot that runs multi-turn surveys over SMS/chat, using an LLM (Claude via AI Gateway) to interpret free-text answers against a structured question schema, with response storage, survey/session config, and long-term conversational memory across retakes.",
+      tags: ["TypeScript", "Cloudflare", "Claude - AI Gateway", "Zep Cloud"],
+      image: "/images/project-2.jpg",
+      size: "small",
+    },
+    {
       title: "Show Me What You Got",
       description:
         "AI-powered movie and TV recommendation web app that understands natural-language preferences and returns personalized picks with rich metadata, trailers, and a polished responsive interface.",
       tags: ["Javascript", "Generative AI", "OpenRouter API", "HTML", "CSS"],
       githubUrl: "https://github.com/AdityaParuchuri/showMeWhatYouGot",
       liveUrl: "https://example.com",
-      image: "/images/project-2.jpg",
-      size: "small",
-    },
-    {
-      title: "AI Code Assistant",
-      description:
-        "ML-powered tool that analyzes code quality, detects bugs, and suggests improvements.",
-      tags: ["Python", "TensorFlow", "FastAPI", "Docker"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://example.com",
       image: "/images/project-3.jpg",
       size: "small",
     },
     {
-      title: "Analytics Dashboard",
+      title: "Live Collab",
       description:
-        "Real-time data visualization platform for monitoring business metrics with custom charts and alerts.",
-      tags: ["TypeScript", "React", "D3.js", "GraphQL"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://example.com",
+        "A real-time collaborative notes app that lets multiple users co-edit the same document concurrently over WebSockets (Socket.io), using Yjs CRDTs to merge simultaneous edits deterministically without locking or last-write-wins data loss, with live presence (avatar chips, per-line cursor indicators), debounced auto-save to MongoDB, and anonymous guest access via shareable document links — no accounts required.",
+      tags: ["TypeScript", "Node.js", "Express", "WebSockets (Socket.io)", "MongoDB"],
+      githubUrl: "https://github.com/AdityaParuchuri/live-collab",
+      liveUrl: "https://live-collab-z46r.onrender.com",
       image: "/images/project-4.jpg",
       size: "large",
     },
