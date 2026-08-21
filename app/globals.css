@@ -1,0 +1,224 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /*
+    Active palette: sawad-inspired (warm neutral + soft gold accents)
+    To switch themes quickly, replace these six accent vars + two background vars.
+
+    Alt A (rose copper):
+    --bg-primary: #0f0d10;
+    --bg-secondary: #1a151c;
+    --text-primary: #f5eff2;
+    --text-secondary: #b9a9b2;
+    --accent-primary: #d1907b;
+    --accent-primary-strong: #b96f58;
+    --accent-secondary: #e2b6a7;
+    --accent-secondary-strong: #cd907a;
+    --accent-primary-rgb: 209, 144, 123;
+    --accent-secondary-rgb: 226, 182, 167;
+
+    Alt B (sage + sand):
+    --bg-primary: #0d1110;
+    --bg-secondary: #151b19;
+    --text-primary: #eff4f1;
+    --text-secondary: #aab7b0;
+    --accent-primary: #8fb4a3;
+    --accent-primary-strong: #769e8c;
+    --accent-secondary: #d2b889;
+    --accent-secondary-strong: #bd9f6a;
+    --accent-primary-rgb: 143, 180, 163;
+    --accent-secondary-rgb: 210, 184, 137;
+  */
+  --bg-primary: #0b0f14;
+  --bg-secondary: #141a22;
+  --text-primary: #eaf0f7;
+  --text-secondary: #97a4b5;
+  --accent-primary: #5f86c9;
+  --accent-primary-strong: #4f76ba;
+  --accent-secondary: #8fa3c2;
+  --accent-secondary-strong: #7d91b0;
+  --accent-primary-rgb: 95, 134, 201;
+  --accent-secondary-rgb: 143, 163, 194;
+  /* Backward-compatible aliases while migrating components/utilities. */
+  --particle-color: var(--accent-primary);
+  --connection-color: var(--accent-secondary);
+  --glow-color: rgba(var(--accent-primary-rgb), 0.5);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--particle-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--connection-color);
+}
+
+::selection {
+  background-color: var(--particle-color);
+  color: white;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.accent-gradient {
+  background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+}
+
+.accent-gradient-triple {
+  background: linear-gradient(
+    to right,
+    var(--accent-primary),
+    var(--accent-secondary),
+    var(--accent-primary)
+  );
+}
+
+.accent-gradient-soft {
+  background: linear-gradient(
+    to right,
+    rgba(var(--accent-primary-rgb), 0.2),
+    rgba(var(--accent-secondary-rgb), 0.2)
+  );
+}
+
+.accent-text {
+  color: var(--accent-primary);
+}
+
+.accent-text-soft {
+  color: rgba(var(--accent-primary-rgb), 0.9);
+}
+
+.accent-text-secondary {
+  color: var(--accent-secondary);
+}
+
+.hover-accent-text:hover {
+  color: var(--accent-primary);
+}
+
+.hover-accent-secondary-text:hover {
+  color: var(--accent-secondary);
+}
+
+.hover-accent-border:hover {
+  border-color: rgba(var(--accent-primary-rgb), 0.4);
+}
+
+.hover-accent-shadow-strong:hover {
+  box-shadow:
+    0 25px 50px -12px rgba(var(--accent-primary-rgb), 0.5),
+    0 0 20px rgba(var(--accent-primary-rgb), 0.35);
+}
+
+.hover-accent-shadow:hover {
+  box-shadow:
+    0 10px 15px -3px rgba(var(--accent-primary-rgb), 0.2),
+    0 4px 6px -4px rgba(var(--accent-primary-rgb), 0.2);
+}
+
+.accent-focus:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-primary {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-white;
+  background: linear-gradient(
+    to right,
+    var(--accent-primary-strong),
+    var(--accent-secondary-strong)
+  );
+  @apply hover:scale-105;
+  box-shadow: 0 8px 20px rgba(var(--accent-primary-rgb), 0.16);
+  @apply active:scale-95;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(
+    to right,
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
+  box-shadow: 0 10px 24px rgba(var(--accent-primary-rgb), 0.22);
+}
+
+.btn-secondary {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300;
+  border: 2px solid var(--accent-primary);
+  color: var(--accent-primary);
+  @apply hover:text-white;
+  @apply active:scale-95;
+}
+
+.btn-secondary:hover {
+  background: var(--accent-primary);
+}
+
+.btn-accent-solid {
+  background: var(--accent-primary-strong);
+}
+
+.btn-accent-solid:hover {
+  background: var(--accent-primary);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.timeline-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge */
+}
+
+.timeline-scroll::-webkit-scrollbar {
+  display: none; /* Chrome / Safari / Opera */
+}
