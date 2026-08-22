@@ -52,3 +52,85 @@ export const timelineItems: TimelineItem[] = [
     type: "experience",
   },
 ];
+
+export interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  githubUrl?: string;
+  liveUrl?: string;
+  image: string;
+  size: "large" | "small";
+}
+
+export const projects: Project[] = [
+  {
+    title: "Prior Authorization Engine",
+    description:
+      "Backend prior authorization engine that ingests FHIR patient data, normalizes it, and uses a rule-based system to evaluate treatment eligibility and identify missing clinical requirements.",
+    tags: ["Python", "FastAPI", "FHIR", "EHR"],
+    githubUrl: "https://github.com/AdityaParuchuri/PriorAuth-Engine",
+    image: "/images/project-1.jpg",
+    size: "large",
+  },
+  {
+    title: "AI Powered Survey Bot",
+    description:
+      "A conversational survey bot that runs multi-turn surveys over SMS/chat, using an LLM (Claude via AI Gateway) to interpret free-text answers against a structured question schema, with response storage, survey/session config, and long-term conversational memory across retakes.",
+    tags: ["TypeScript", "Cloudflare", "Claude - AI Gateway", "Zep Cloud"],
+    image: "/images/project-2.jpg",
+    size: "small",
+  },
+  {
+    title: "Show Me What You Got",
+    description:
+      "AI-powered movie and TV recommendation web app that understands natural-language preferences and returns personalized picks with rich metadata, trailers, and a polished responsive interface.",
+    tags: ["Javascript", "Generative AI", "OpenRouter API", "HTML", "CSS"],
+    githubUrl: "https://github.com/AdityaParuchuri/showMeWhatYouGot",
+    image: "/images/project-3.jpg",
+    size: "small",
+  },
+  {
+    title: "Live Collab",
+    description:
+      "A real-time collaborative notes app that lets multiple users co-edit the same document concurrently over WebSockets (Socket.io), using Yjs CRDTs to merge simultaneous edits deterministically without locking or last-write-wins data loss, with live presence (avatar chips, per-line cursor indicators), debounced auto-save to MongoDB, and anonymous guest access via shareable document links — no accounts required.",
+    tags: ["TypeScript", "Node.js", "Express", "WebSockets (Socket.io)", "MongoDB"],
+    githubUrl: "https://github.com/AdityaParuchuri/live-collab",
+    liveUrl: "https://live-collab-z46r.onrender.com",
+    image: "/images/project-4.jpg",
+    size: "large",
+  },
+];
+
+export function buildSystemPrompt(): string {
+  const timelineText = timelineItems
+    .map(
+      (item) =>
+        `- ${item.year}: ${item.title} at ${item.organization} (${item.type}). ${item.description}`
+    )
+    .join("\n");
+
+  const projectsText = projects
+    .map((project) => `- ${project.title}: ${project.description}`)
+    .join("\n");
+
+  return `You are speaking as Aditya Paruchuri, answering questions from visitors on your personal portfolio website. Always answer in first person, as if you are Aditya himself talking to the visitor.
+
+Keep answers concise and conversational — 2 to 4 sentences — since they are spoken aloud to the visitor, not just displayed as text.
+
+Base every answer only on the background below. Don't invent, guess, or fabricate any facts, dates, employers, or details that aren't included here — if you don't know something, say so honestly rather than making it up.
+
+If a question is off-topic or inappropriate (unrelated to your background, projects, or experience), decline politely and redirect the conversation back to your work.
+
+## About
+
+${bio}
+
+## Background
+
+${timelineText}
+
+## Projects
+
+${projectsText}`;
+}
