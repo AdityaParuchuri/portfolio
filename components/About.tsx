@@ -3,6 +3,7 @@
 import { motion, useInView } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useCallback, useEffect, useLayoutEffect } from "react";
+import { bio, timelineItems } from "@/lib/persona";
 
 const BASE_CARD_WIDTH = 260;
 const CARD_GAP = 24;
@@ -45,53 +46,10 @@ export default function About() {
     });
   };
 
-  const timelineItems = [
-    {
-      year: "2016-2020",
-      title: "Bachelor of Technology in Information and Communication Technology",
-      organization: "Dhirubhai Ambani Institute of Information and Communication Technology",
-      description: "Undergraduate degree spanning coursework in Computer Science, Mathematics, and Electronics.",
-      tags: ["Data Structures and Algorithms", "Computer Netwroks", "Operating Systems", "Database Management Systems", "Computer Organization and Architecture"],
-      type: "education" as const,
-    },
-    {
-      year: "2020 - 2020",
-      title: "Internship - Software Developer",
-      organization: "Defense Research and Development Laboratory",
-      description: "Engineered a high-throughput Go telemetry pipeline and fault-tolerant gRPC microservices, then built secure TypeScript/Node.js APIs and React dashboards to enable real-time, reliable monitoring and faster decision-making for mission-critical systems.",
-      tags: ["Go", "Typescript", "Node.js", "React", "gRPC"],
-      type: "experience" as const,
-    },
-    {
-      year: "2020 - 2022",
-      title: "Associate Software Development Engineer",
-      organization: "Publicis Sapient",
-      description: "Built and scaled high-availability Java/Spring Boot/Kafka microservices, ETL pipelines, and a React vendor portal on AWS, enabling reliable real-time processing, faster analytics workflows, and stronger delivery across cross-functional Agile teams.",
-      tags: ["Java", "Spring Boot", "Kafka", "AWS", "React", "PostgreSQL"],
-      type: "experience" as const,
-    },
-    {
-      year: "2022 - 2024",
-      title: "Master of Science in Information Technology",
-      organization: "Arizona State University",
-      description: "Masters degree in Information Technology with a focus on distributed systems, cloud computing, and artificial intelligence.",
-      tags: ["Distributed Computing","Data Engineering", "Cloud Infrastructure and Computing", "NLP", "Project Management"],
-      type: "education" as const,
-    },
-    {
-      year: "2024 - present",
-      title: "Software Engineer",
-      organization: "Plaid",
-      description: "Architected AI-enabled Java/Spring Boot and Python microservices with secure REST/event-driven APIs, scalable AWS/Kubernetes deployment, and React/TypeScript operational dashboards to power reliable fraud detection, risk scoring, and workflow automation.",
-      tags: ["Java", "Spring Boot", "Python", "Typescript", "AWS", "React", "PostgreSQL", "CI/CD", "LLM", "gRPC"],
-      type: "experience" as const,
-    }
-  ];
-
   useEffect(() => {
     setCardWidths((prev) => timelineItems.map((_, index) => prev[index] ?? BASE_CARD_WIDTH));
     setCardHeights((prev) => timelineItems.map((_, index) => prev[index] ?? DEFAULT_CARD_HEIGHT));
-  }, [timelineItems.length]);
+  }, []);
 
   useLayoutEffect(() => {
     if (cardWidths.length === 0) return;
@@ -127,7 +85,7 @@ export default function About() {
     if (heightsChanged) {
       setCardHeights(nextHeights);
     }
-  }, [cardWidths, cardHeights, timelineItems]);
+  }, [cardWidths, cardHeights]);
 
   useEffect(() => {
     handleScroll();
@@ -200,7 +158,7 @@ export default function About() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-gray-400 leading-relaxed text-center w-full mb-4"
           >
-            I&apos;m an ever-curious software engineer with over 3 years of experience building distributed, scalable systems, RESTful APIs, and AI-powered platforms using Java, Python, Spring Boot, and TypeScript. Proficient in event-driven architectures with Kafka, cloud-native deployments on AWS with Kubernetes, and integrating Large Language Models into production systems. Experienced in delivering full-stack solutions with React and Node.js, implementing CI/CD pipelines, and maintaining high-availability systems with comprehensive observability.
+            {bio}
           </motion.p>
 
           {/* Horizontal Timeline */}
