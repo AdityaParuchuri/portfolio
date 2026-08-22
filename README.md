@@ -38,12 +38,14 @@ npm start
 
 ## Deployment
 
-Recommended: [Vercel](https://vercel.com) (free tier, zero-config for Next.js).
+Deployed on **Cloudflare Workers** via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare) (chosen to run the upcoming "virtual me" avatar feature's backend on Workers AI/KV).
 
 ```bash
-npm install -g vercel
-vercel
+npm run preview   # build + serve locally on the real Workers runtime (wrangler dev)
+npm run deploy    # build + publish to production
 ```
+
+Bindings (Workers AI, KV, static assets) are declared in `wrangler.jsonc`. Requires `wrangler login` once per machine.
 
 ## Project Structure
 
