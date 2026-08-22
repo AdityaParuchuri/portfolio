@@ -59,7 +59,9 @@ export default function Contact() {
       });
 
       if (!response.ok) {
-        const errorPayload = await response.json().catch(() => null);
+        const errorPayload = (await response.json().catch(() => null)) as {
+          errors?: { message?: string }[];
+        } | null;
         const formspreeMessage =
           errorPayload?.errors?.[0]?.message ??
           "Unable to send message right now. Please try again.";
