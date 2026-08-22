@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { ExternalLink, Github } from "lucide-react";
 import Image from "next/image";
 
-interface Project {
+export interface Project {
   title: string;
   description: string;
   tags: string[];
@@ -15,6 +15,45 @@ interface Project {
   image: string;
   size: "large" | "small";
 }
+
+export const projects: Project[] = [
+  {
+    title: "Prior Authorization Engine",
+    description:
+      "Backend prior authorization engine that ingests FHIR patient data, normalizes it, and uses a rule-based system to evaluate treatment eligibility and identify missing clinical requirements.",
+    tags: ["Python", "FastAPI", "FHIR", "EHR"],
+    githubUrl: "https://github.com/AdityaParuchuri/PriorAuth-Engine",
+    image: "/images/project-1.jpg",
+    size: "large",
+  },
+  {
+    title: "AI Powered Survey Bot",
+    description:
+      "A conversational survey bot that runs multi-turn surveys over SMS/chat, using an LLM (Claude via AI Gateway) to interpret free-text answers against a structured question schema, with response storage, survey/session config, and long-term conversational memory across retakes.",
+    tags: ["TypeScript", "Cloudflare", "Claude - AI Gateway", "Zep Cloud"],
+    image: "/images/project-2.jpg",
+    size: "small",
+  },
+  {
+    title: "Show Me What You Got",
+    description:
+      "AI-powered movie and TV recommendation web app that understands natural-language preferences and returns personalized picks with rich metadata, trailers, and a polished responsive interface.",
+    tags: ["Javascript", "Generative AI", "OpenRouter API", "HTML", "CSS"],
+    githubUrl: "https://github.com/AdityaParuchuri/showMeWhatYouGot",
+    image: "/images/project-3.jpg",
+    size: "small",
+  },
+  {
+    title: "Live Collab",
+    description:
+      "A real-time collaborative notes app that lets multiple users co-edit the same document concurrently over WebSockets (Socket.io), using Yjs CRDTs to merge simultaneous edits deterministically without locking or last-write-wins data loss, with live presence (avatar chips, per-line cursor indicators), debounced auto-save to MongoDB, and anonymous guest access via shareable document links — no accounts required.",
+    tags: ["TypeScript", "Node.js", "Express", "WebSockets (Socket.io)", "MongoDB"],
+    githubUrl: "https://github.com/AdityaParuchuri/live-collab",
+    liveUrl: "https://live-collab-z46r.onrender.com",
+    image: "/images/project-4.jpg",
+    size: "large",
+  },
+];
 
 function ProjectCard({
   project,
@@ -127,45 +166,6 @@ export default function Projects() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  const projects: Project[] = [
-    {
-      title: "Prior Authorization Engine",
-      description:
-        "Backend prior authorization engine that ingests FHIR patient data, normalizes it, and uses a rule-based system to evaluate treatment eligibility and identify missing clinical requirements.",
-      tags: ["Python", "FastAPI", "FHIR", "EHR"],
-      githubUrl: "https://github.com/AdityaParuchuri/PriorAuth-Engine",
-      image: "/images/project-1.jpg",
-      size: "large",
-    },
-    {
-      title: "AI Powered Survey Bot",
-      description:
-        "A conversational survey bot that runs multi-turn surveys over SMS/chat, using an LLM (Claude via AI Gateway) to interpret free-text answers against a structured question schema, with response storage, survey/session config, and long-term conversational memory across retakes.",
-      tags: ["TypeScript", "Cloudflare", "Claude - AI Gateway", "Zep Cloud"],
-      image: "/images/project-2.jpg",
-      size: "small",
-    },
-    {
-      title: "Show Me What You Got",
-      description:
-        "AI-powered movie and TV recommendation web app that understands natural-language preferences and returns personalized picks with rich metadata, trailers, and a polished responsive interface.",
-      tags: ["Javascript", "Generative AI", "OpenRouter API", "HTML", "CSS"],
-      githubUrl: "https://github.com/AdityaParuchuri/showMeWhatYouGot",
-      image: "/images/project-3.jpg",
-      size: "small",
-    },
-    {
-      title: "Live Collab",
-      description:
-        "A real-time collaborative notes app that lets multiple users co-edit the same document concurrently over WebSockets (Socket.io), using Yjs CRDTs to merge simultaneous edits deterministically without locking or last-write-wins data loss, with live presence (avatar chips, per-line cursor indicators), debounced auto-save to MongoDB, and anonymous guest access via shareable document links — no accounts required.",
-      tags: ["TypeScript", "Node.js", "Express", "WebSockets (Socket.io)", "MongoDB"],
-      githubUrl: "https://github.com/AdityaParuchuri/live-collab",
-      liveUrl: "https://live-collab-z46r.onrender.com",
-      image: "/images/project-4.jpg",
-      size: "large",
-    },
-  ];
 
   const leftColumn = projects.filter((_, i) => i % 2 === 0);
   const rightColumn = projects.filter((_, i) => i % 2 === 1);
