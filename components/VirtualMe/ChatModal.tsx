@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Send, X } from "lucide-react";
+import { Loader2, Send, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useVirtualMeChat } from "./useVirtualMeChat";
 
@@ -77,7 +77,10 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               ))}
 
               {status === "thinking" && (
-                <p className="text-sm text-gray-400">Thinking...</p>
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Thinking...</span>
+                </div>
               )}
 
               {status === "error" && (
