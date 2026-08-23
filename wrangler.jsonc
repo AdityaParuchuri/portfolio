@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "portfolio-v2",
+  "name": "aditya",
   "account_id": "d077181d22ab5d2ecf69c3d772717dbd",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-08-22",
@@ -12,7 +12,7 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "portfolio-v2"
+      "service": "aditya"
     }
   ],
   "images": {
