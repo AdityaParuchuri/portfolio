@@ -222,3 +222,12 @@ body {
 .timeline-scroll::-webkit-scrollbar {
   display: none; /* Chrome / Safari / Opera */
 }
+
+@keyframes popPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.animate-pop-pulse {
+  animation: popPulse 2.4s ease-in-out infinite;
+}
