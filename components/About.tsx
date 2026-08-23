@@ -14,6 +14,7 @@ const LINE_TO_CARD_GAP = 12;
 const DOT_ZONE_HEIGHT = 20;
 const TIMELINE_VERTICAL_PADDING = 0;
 const DEFAULT_CARD_HEIGHT = 170;
+const INTRO_SWEEP_DURATION_MS = 1100;
 
 export default function About() {
   const ref = useRef(null);
@@ -95,19 +96,54 @@ export default function About() {
     const el = scrollRef.current;
     if (!el || !isInView || hasInitializedTimelinePosition.current) return;
 
-    // Wait for layout to settle so we can reliably jump to the far-right edge.
+    let sweepRafId = 0;
+
+    const settle = () => {
+      hasInitializedTimelinePosition.current = true;
+
+      // Resting short of the true max would clip the latest (rightmost) card's
+      // own content to reveal more of the previous one -- there's no scroll
+      // position that shows the last card in full AND extra peek of the one
+      // before it, since the viewport is a fixed width. So rest at the true
+      // max; the sweep animation below is what carries the "there's more"
+      // signal instead.
+      const target = Math.max(0, el.scrollWidth - el.clientWidth);
+
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReducedMotion || target === 0) {
+        el.scrollLeft = target;
+        handleScroll();
+        return;
+      }
+
+      // Sweep from the earliest entry across to the latest on first view --
+      // a single motion that demonstrates this scrolls, rather than relying
+      // on a visitor to notice a small chevron.
+      el.scrollLeft = 0;
+      const start = performance.now();
+      const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+      const step = (now: number) => {
+        const progress = Math.min(1, (now - start) / INTRO_SWEEP_DURATION_MS);
+        el.scrollLeft = target * easeInOutCubic(progress);
+        handleScroll();
+        if (progress < 1) {
+          sweepRafId = window.requestAnimationFrame(step);
+        }
+      };
+      sweepRafId = window.requestAnimationFrame(step);
+    };
+
+    // Wait for layout to settle so widths/heights are measured before computing the sweep target.
     let rafTwo = 0;
     const rafOne = window.requestAnimationFrame(() => {
-      rafTwo = window.requestAnimationFrame(() => {
-        el.scrollLeft = el.scrollWidth;
-        handleScroll();
-        hasInitializedTimelinePosition.current = true;
-      });
+      rafTwo = window.requestAnimationFrame(settle);
     });
 
     return () => {
       window.cancelAnimationFrame(rafOne);
       if (rafTwo) window.cancelAnimationFrame(rafTwo);
+      if (sweepRafId) window.cancelAnimationFrame(sweepRafId);
     };
   }, [isInView, cardWidths, handleScroll]);
 
