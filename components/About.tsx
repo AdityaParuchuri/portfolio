@@ -97,6 +97,7 @@ export default function About() {
     if (!el || !isInView || hasInitializedTimelinePosition.current) return;
 
     let sweepRafId = 0;
+    let snapTypeToRestore = "";
 
     const settle = () => {
       hasInitializedTimelinePosition.current = true;
@@ -119,6 +120,15 @@ export default function About() {
       // Sweep from the earliest entry across to the latest on first view --
       // a single motion that demonstrates this scrolls, rather than relying
       // on a visitor to notice a small chevron.
+      //
+      // scroll-snap-type fights per-frame scrollLeft writes: it kept
+      // overriding the in-between positions and snapping straight to the
+      // nearest card edge, so the "smooth" sweep visually looked like 2-3
+      // discrete jumps instead of continuous motion. Disable snapping for
+      // the animation's duration and restore it once it lands (see cleanup
+      // below for the interrupted case).
+      snapTypeToRestore = el.style.scrollSnapType;
+      el.style.scrollSnapType = "none";
       el.scrollLeft = 0;
       const start = performance.now();
       const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -129,6 +139,8 @@ export default function About() {
         handleScroll();
         if (progress < 1) {
           sweepRafId = window.requestAnimationFrame(step);
+        } else {
+          el.style.scrollSnapType = snapTypeToRestore;
         }
       };
       sweepRafId = window.requestAnimationFrame(step);
@@ -144,6 +156,7 @@ export default function About() {
       window.cancelAnimationFrame(rafOne);
       if (rafTwo) window.cancelAnimationFrame(rafTwo);
       if (sweepRafId) window.cancelAnimationFrame(sweepRafId);
+      if (snapTypeToRestore) el.style.scrollSnapType = snapTypeToRestore;
     };
   }, [isInView, cardWidths, handleScroll]);
 
