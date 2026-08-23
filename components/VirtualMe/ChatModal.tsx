@@ -14,9 +14,11 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
   const { messages, status, sendMessage } = useVirtualMeChat();
   const [input, setInput] = useState("");
 
+  const isBusy = status === "thinking" || status === "streaming";
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || status === "thinking") return;
+    if (!input.trim() || isBusy) return;
     sendMessage(input);
     setInput("");
   };
@@ -94,7 +96,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               />
               <button
                 type="submit"
-                disabled={status === "thinking"}
+                disabled={isBusy}
                 className="btn-accent-solid rounded-lg px-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Send"
               >
