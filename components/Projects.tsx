@@ -125,7 +125,7 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="scroll-mt-8 md:scroll-mt-10 pt-12 md:pt-14 pb-8 md:pb-10 bg-[var(--bg-primary)]"
+      className="scroll-mt-8 md:scroll-mt-10 pt-8 md:pt-10 pb-8 md:pb-10 bg-[var(--bg-primary)]"
       ref={ref}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
