@@ -224,10 +224,29 @@ body {
 }
 
 @keyframes popPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 25px 50px -12px rgba(var(--accent-primary-rgb), 0),
+      0 0 20px rgba(var(--accent-primary-rgb), 0);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow:
+      0 25px 50px -12px rgba(var(--accent-primary-rgb), 0.5),
+      0 0 20px rgba(var(--accent-primary-rgb), 0.35);
+  }
 }
 
 .animate-pop-pulse {
   animation: popPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.animate-text-pulse {
+  animation: textPulse 2.4s ease-in-out infinite;
 }

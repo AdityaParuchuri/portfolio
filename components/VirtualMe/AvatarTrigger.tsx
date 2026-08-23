@@ -39,9 +39,9 @@ export default function AvatarTrigger({ onOpen }: AvatarTriggerProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8, duration: 0.8 }}
-        className="mt-3 text-xs text-gray-400"
+        className="animate-text-pulse mt-3 text-xs text-gray-400"
       >
-        tap to interact
+        Tap To Interact
       </motion.p>
     </motion.div>
   );
