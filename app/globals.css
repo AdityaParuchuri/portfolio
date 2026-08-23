@@ -160,6 +160,13 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Same glass treatment, but with a near-opaque background -- for panels
+   (like the chat modal) that need to stay legible over busy content on
+   small screens, where the standard .glass tint is too subtle. */
+.glass-solid {
+  background: color-mix(in srgb, var(--bg-primary) 95%, transparent);
+}
+
 .btn-primary {
   @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-white;
   background: linear-gradient(
