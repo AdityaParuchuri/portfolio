@@ -1,5 +1,6 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { buildSystemPrompt } from "@/lib/persona";
+import { toNdjsonStream } from "@/lib/aiStream";
 
 const CHAT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
@@ -12,9 +13,12 @@ export async function POST(request: Request) {
   const { env } = await getCloudflareContext();
   const { messages } = (await request.json()) as { messages: ChatMessage[] };
 
-  const result = await env.AI.run(CHAT_MODEL, {
+  const aiStream = await env.AI.run(CHAT_MODEL, {
     messages: [{ role: "system", content: buildSystemPrompt() }, ...messages],
+    stream: true,
   });
 
-  return Response.json(result);
+  return new Response(toNdjsonStream(aiStream), {
+    headers: { "content-type": "application/x-ndjson" },
+  });
 }
