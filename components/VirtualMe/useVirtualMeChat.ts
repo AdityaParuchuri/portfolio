@@ -9,13 +9,14 @@ export interface ChatTurn {
 
 interface ChatState {
   messages: ChatTurn[];
-  status: "idle" | "thinking" | "error";
+  status: "idle" | "thinking" | "streaming" | "error";
   error: string | null;
 }
 
 type ChatAction =
   | { type: "send"; text: string }
-  | { type: "assistantComplete"; text: string }
+  | { type: "assistantDelta"; text: string }
+  | { type: "assistantDone" }
   | { type: "error"; message: string };
 
 function reducer(state: ChatState, action: ChatAction): ChatState {
@@ -26,12 +27,19 @@ function reducer(state: ChatState, action: ChatAction): ChatState {
         status: "thinking",
         error: null,
       };
-    case "assistantComplete":
-      return {
-        ...state,
-        messages: [...state.messages, { role: "assistant", content: action.text }],
-        status: "idle",
-      };
+    case "assistantDelta": {
+      const last = state.messages[state.messages.length - 1];
+      const messages =
+        last?.role === "assistant"
+          ? [
+              ...state.messages.slice(0, -1),
+              { role: "assistant" as const, content: last.content + action.text },
+            ]
+          : [...state.messages, { role: "assistant" as const, content: action.text }];
+      return { ...state, messages, status: "streaming" };
+    }
+    case "assistantDone":
+      return { ...state, status: "idle" };
     case "error":
       return { ...state, status: "error", error: action.message };
   }
@@ -66,7 +74,6 @@ export function useVirtualMeChat() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
-        let fullText = "";
 
         while (true) {
           const { done, value } = await reader.read();
@@ -78,12 +85,12 @@ export function useVirtualMeChat() {
 
           for (const line of lines) {
             if (!line) continue;
-            const event = JSON.parse(line) as { delta?: string; done?: true; fullText?: string };
-            if (event.done) fullText = event.fullText ?? fullText;
+            const event = JSON.parse(line) as { delta?: string; done?: true };
+            if (event.delta) dispatch({ type: "assistantDelta", text: event.delta });
           }
         }
 
-        dispatch({ type: "assistantComplete", text: fullText });
+        dispatch({ type: "assistantDone" });
       } catch (err) {
         dispatch({
           type: "error",
