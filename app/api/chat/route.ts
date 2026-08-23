@@ -24,12 +24,25 @@ export async function POST(request: Request) {
 
   const { messages } = (await request.json()) as { messages: ChatMessage[] };
 
-  const aiStream = await env.AI.run(CHAT_MODEL, {
-    messages: [{ role: "system", content: buildSystemPrompt() }, ...messages],
-    stream: true,
-  });
+  try {
+    const aiStream = await env.AI.run(CHAT_MODEL, {
+      messages: [{ role: "system", content: buildSystemPrompt() }, ...messages],
+      stream: true,
+    });
 
-  return new Response(toNdjsonStream(aiStream), {
-    headers: { "content-type": "application/x-ndjson" },
-  });
+    return new Response(toNdjsonStream(aiStream), {
+      headers: { "content-type": "application/x-ndjson" },
+    });
+  } catch (error) {
+    // Workers AI's free tier caps out at 10,000 neurons/day account-wide; once
+    // hit, env.AI.run throws rather than returning a normal response. Surface
+    // this distinctly so the client can show a friendly message instead of a
+    // generic "Request failed: 500".
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("neurons")) {
+      return Response.json({ error: "quota_exhausted" }, { status: 503 });
+    }
+    console.error(error);
+    return Response.json({ error: "internal_error" }, { status: 500 });
+  }
 }

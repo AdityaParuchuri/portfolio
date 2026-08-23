@@ -34,7 +34,8 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
   }, [messages, status]);
 
   const isCapped = status === "capped";
-  const isBusy = status === "thinking" || status === "streaming" || isCapped;
+  const isUnavailable = status === "unavailable";
+  const isBusy = status === "thinking" || status === "streaming" || isCapped || isUnavailable;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -121,7 +122,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 </div>
               )}
 
-              {isCapped && (
+              {(isCapped || isUnavailable) && (
                 <p className="text-sm text-gray-400">{error}</p>
               )}
             </div>
@@ -130,8 +131,10 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={isCapped ? "Session complete" : "Ask a question..."}
-                disabled={isCapped}
+                placeholder={
+                  isCapped ? "Session complete" : isUnavailable ? "Unavailable right now" : "Ask a question..."
+                }
+                disabled={isCapped || isUnavailable}
                 className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-500 accent-focus focus:outline-none disabled:opacity-50"
               />
               <button
