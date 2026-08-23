@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Mic, Send, Square, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useVirtualMeChat } from "./useVirtualMeChat";
+import AudioReactiveAvatar from "./AudioReactiveAvatar";
 
 interface ChatModalProps {
   isOpen: boolean;
@@ -11,12 +12,25 @@ interface ChatModalProps {
 }
 
 export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
-  const { messages, status, micError, sendMessage, startRecording, stopRecording } =
-    useVirtualMeChat();
+  const {
+    messages,
+    status,
+    micError,
+    isSpeaking,
+    analyserRef,
+    sendMessage,
+    startRecording,
+    stopRecording,
+  } = useVirtualMeChat();
   const [input, setInput] = useState("");
 
   const isRecording = status === "recording";
   const isBusy = status === "thinking" || status === "streaming" || status === "transcribing";
+  const avatarState = isSpeaking
+    ? "speaking"
+    : status === "thinking" || status === "transcribing"
+      ? "thinking"
+      : "idle";
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -64,6 +78,8 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            <AudioReactiveAvatar state={avatarState} analyserRef={analyserRef} />
 
             <div className="space-y-3 max-h-80 overflow-y-auto mb-4 pr-1">
               {messages.length === 0 && status !== "thinking" && (
