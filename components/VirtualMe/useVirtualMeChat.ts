@@ -63,8 +63,53 @@ export function useVirtualMeChat() {
     error: null,
   });
   const [micError, setMicError] = useState<string | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+
+  const playSpeech = useCallback(async (text: string) => {
+    if (!text.trim()) return;
+
+    try {
+      const response = await fetch("/api/speak", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!response.ok) throw new Error(`Speech request failed: ${response.status}`);
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const audioEl = new Audio(url);
+
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+      const audioContext = audioContextRef.current;
+      const source = audioContext.createMediaElementSource(audioEl);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      analyserRef.current = analyser;
+
+      audioEl.onended = () => {
+        setIsSpeaking(false);
+        analyserRef.current = null;
+        URL.revokeObjectURL(url);
+      };
+
+      setIsSpeaking(true);
+      await audioEl.play();
+    } catch {
+      // Graceful degrade to text-only per the plan: the answer already
+      // streamed into the transcript before this runs, so a TTS failure
+      // just means no audio plays -- no error surfaced to the user.
+      setIsSpeaking(false);
+    }
+  }, []);
 
   const sendMessage = useCallback(
     async (text: string) => {
@@ -88,6 +133,7 @@ export function useVirtualMeChat() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
+        let fullText = "";
 
         while (true) {
           const { done, value } = await reader.read();
@@ -100,11 +146,15 @@ export function useVirtualMeChat() {
           for (const line of lines) {
             if (!line) continue;
             const event = JSON.parse(line) as { delta?: string; done?: true };
-            if (event.delta) dispatch({ type: "assistantDelta", text: event.delta });
+            if (event.delta) {
+              fullText += event.delta;
+              dispatch({ type: "assistantDelta", text: event.delta });
+            }
           }
         }
 
         dispatch({ type: "assistantDone" });
+        void playSpeech(fullText);
       } catch (err) {
         dispatch({
           type: "error",
@@ -112,7 +162,7 @@ export function useVirtualMeChat() {
         });
       }
     },
-    [state.messages]
+    [state.messages, playSpeech]
   );
 
   const startRecording = useCallback(async () => {
@@ -167,6 +217,8 @@ export function useVirtualMeChat() {
     status: state.status,
     error: state.error,
     micError,
+    isSpeaking,
+    analyserRef,
     sendMessage,
     startRecording,
     stopRecording,
