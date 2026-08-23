@@ -102,7 +102,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="scroll-mt-8 md:scroll-mt-10 min-h-screen pt-12 md:pt-14 pb-8 md:pb-10 relative bg-[var(--bg-primary)]"
+      className="scroll-mt-8 md:scroll-mt-10 min-h-screen pt-8 md:pt-10 pb-8 md:pb-10 relative bg-[var(--bg-primary)]"
       ref={ref}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

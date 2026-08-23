@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useCallback, useEffect, useLayoutEffect } from "react";
 import { bio, timelineItems } from "@/lib/persona";
 
-const BASE_CARD_WIDTH = 260;
+const BASE_CARD_WIDTH = 234; // 260 * 0.9 -- narrower cards fit more on screen at once
 const CARD_GAP = 24;
 const MAX_CARD_HEIGHT = 260;
 const WIDTH_STEP = 40;
@@ -14,14 +14,19 @@ const LINE_TO_CARD_GAP = 12;
 const DOT_ZONE_HEIGHT = 20;
 const TIMELINE_VERTICAL_PADDING = 0;
 const DEFAULT_CARD_HEIGHT = 170;
-const INTRO_SWEEP_DURATION_MS = 1100;
+const INTRO_SWEEP_DURATION_MS = 2000;
 
 export default function About() {
   const ref = useRef(null);
+  const timelineRef = useRef(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardContentRefs = useRef<Array<HTMLDivElement | null>>([]);
   const hasInitializedTimelinePosition = useRef(false);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  // Fires when the timeline's own vertical center crosses the viewport's
+  // center, not just when the About section starts entering -- so the
+  // sweep plays while a visitor is actually looking at the timeline.
+  const isTimelineCentered = useInView(timelineRef, { once: true, margin: "-50% 0px -50% 0px" });
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [cardWidths, setCardWidths] = useState<number[]>([]);
@@ -94,7 +99,7 @@ export default function About() {
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el || !isInView || hasInitializedTimelinePosition.current) return;
+    if (!el || !isTimelineCentered || hasInitializedTimelinePosition.current) return;
 
     let sweepRafId = 0;
     let snapTypeToRestore = "";
@@ -158,7 +163,7 @@ export default function About() {
       if (sweepRafId) window.cancelAnimationFrame(sweepRafId);
       if (snapTypeToRestore) el.style.scrollSnapType = snapTypeToRestore;
     };
-  }, [isInView, cardWidths, handleScroll]);
+  }, [isTimelineCentered, cardWidths, handleScroll]);
 
   const resolvedCardWidths = timelineItems.map((_, index) => cardWidths[index] ?? BASE_CARD_WIDTH);
   const resolvedCardHeights = timelineItems.map((_, index) => cardHeights[index] ?? DEFAULT_CARD_HEIGHT);
@@ -186,7 +191,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="scroll-mt-8 md:scroll-mt-10 pt-12 md:pt-14 pb-8 md:pb-10 relative bg-[var(--bg-primary)]"
+      className="scroll-mt-8 md:scroll-mt-10 pt-8 md:pt-10 pb-8 md:pb-10 relative bg-[var(--bg-primary)]"
       ref={ref}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -212,6 +217,7 @@ export default function About() {
 
           {/* Horizontal Timeline */}
           <motion.div
+            ref={timelineRef}
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.8, delay: 0.3 }}
