@@ -1,10 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Mic, Send, Square, X } from "lucide-react";
+import { Loader2, Send, X } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useVirtualMeChat } from "./useVirtualMeChat";
-import AudioReactiveAvatar from "./AudioReactiveAvatar";
+import ChatAvatar from "./ChatAvatar";
 
 interface ChatModalProps {
   isOpen: boolean;
@@ -12,18 +12,7 @@ interface ChatModalProps {
 }
 
 export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
-  const {
-    messages,
-    status,
-    error,
-    micError,
-    isSpeaking,
-    analyserRef,
-    sendMessage,
-    retryLastMessage,
-    startRecording,
-    stopRecording,
-  } = useVirtualMeChat();
+  const { messages, status, error, sendMessage, retryLastMessage } = useVirtualMeChat();
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
@@ -44,29 +33,14 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     el.scrollTop = el.scrollHeight;
   }, [messages, status]);
 
-  const isRecording = status === "recording";
   const isCapped = status === "capped";
-  const isBusy =
-    status === "thinking" || status === "streaming" || status === "transcribing" || isCapped;
-  const avatarState = isSpeaking
-    ? "speaking"
-    : status === "thinking" || status === "transcribing"
-      ? "thinking"
-      : "idle";
+  const isBusy = status === "thinking" || status === "streaming" || isCapped;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isBusy || isRecording) return;
+    if (!input.trim() || isBusy) return;
     sendMessage(input);
     setInput("");
-  };
-
-  const handleMicClick = () => {
-    if (isRecording) {
-      stopRecording();
-    } else if (!isBusy) {
-      startRecording();
-    }
   };
 
   return (
@@ -101,7 +75,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               </button>
             </div>
 
-            <AudioReactiveAvatar state={avatarState} analyserRef={analyserRef} />
+            <ChatAvatar />
 
             <div
               ref={scrollRef}
@@ -128,13 +102,6 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 </div>
               ))}
 
-              {status === "transcribing" && (
-                <div className="flex items-center gap-2 text-sm text-gray-400">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Transcribing...</span>
-                </div>
-              )}
-
               {status === "thinking" && (
                 <div className="flex items-center gap-2 text-sm text-gray-400">
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -159,36 +126,17 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               )}
             </div>
 
-            {micError && (
-              <p className="text-xs text-red-400 mb-2">{micError}</p>
-            )}
-
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={
-                  isRecording ? "Listening..." : isCapped ? "Session complete" : "Ask a question..."
-                }
-                disabled={isRecording || isCapped}
+                placeholder={isCapped ? "Session complete" : "Ask a question..."}
+                disabled={isCapped}
                 className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-500 accent-focus focus:outline-none disabled:opacity-50"
               />
               <button
-                type="button"
-                onClick={handleMicClick}
-                disabled={isBusy && !isRecording}
-                className={`rounded-lg px-3 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isRecording
-                    ? "bg-red-500 hover:bg-red-600 text-white"
-                    : "glass hover:bg-white/10"
-                }`}
-                aria-label={isRecording ? "Stop recording" : "Record a question"}
-              >
-                {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              </button>
-              <button
                 type="submit"
-                disabled={isBusy || isRecording}
+                disabled={isBusy}
                 className="btn-accent-solid rounded-lg px-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Send"
               >
