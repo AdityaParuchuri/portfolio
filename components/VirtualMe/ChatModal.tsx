@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Send, X } from "lucide-react";
+import { Loader2, Mic, Send, Square, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useVirtualMeChat } from "./useVirtualMeChat";
 
@@ -11,16 +11,26 @@ interface ChatModalProps {
 }
 
 export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
-  const { messages, status, sendMessage } = useVirtualMeChat();
+  const { messages, status, micError, sendMessage, startRecording, stopRecording } =
+    useVirtualMeChat();
   const [input, setInput] = useState("");
 
-  const isBusy = status === "thinking" || status === "streaming";
+  const isRecording = status === "recording";
+  const isBusy = status === "thinking" || status === "streaming" || status === "transcribing";
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isBusy) return;
+    if (!input.trim() || isBusy || isRecording) return;
     sendMessage(input);
     setInput("");
+  };
+
+  const handleMicClick = () => {
+    if (isRecording) {
+      stopRecording();
+    } else if (!isBusy) {
+      startRecording();
+    }
   };
 
   return (
@@ -76,6 +86,13 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 </div>
               ))}
 
+              {status === "transcribing" && (
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Transcribing...</span>
+                </div>
+              )}
+
               {status === "thinking" && (
                 <div className="flex items-center gap-2 text-sm text-gray-400">
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -90,16 +107,34 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               )}
             </div>
 
+            {micError && (
+              <p className="text-xs text-red-400 mb-2">{micError}</p>
+            )}
+
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask a question..."
-                className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-500 accent-focus focus:outline-none"
+                placeholder={isRecording ? "Listening..." : "Ask a question..."}
+                disabled={isRecording}
+                className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-500 accent-focus focus:outline-none disabled:opacity-50"
               />
               <button
+                type="button"
+                onClick={handleMicClick}
+                disabled={isBusy && !isRecording}
+                className={`rounded-lg px-3 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  isRecording
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : "glass hover:bg-white/10"
+                }`}
+                aria-label={isRecording ? "Stop recording" : "Record a question"}
+              >
+                {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </button>
+              <button
                 type="submit"
-                disabled={isBusy}
+                disabled={isBusy || isRecording}
                 className="btn-accent-solid rounded-lg px-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Send"
               >
