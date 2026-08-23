@@ -15,17 +15,21 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
   const {
     messages,
     status,
+    error,
     micError,
     isSpeaking,
     analyserRef,
     sendMessage,
+    retryLastMessage,
     startRecording,
     stopRecording,
   } = useVirtualMeChat();
   const [input, setInput] = useState("");
 
   const isRecording = status === "recording";
-  const isBusy = status === "thinking" || status === "streaming" || status === "transcribing";
+  const isCapped = status === "capped";
+  const isBusy =
+    status === "thinking" || status === "streaming" || status === "transcribing" || isCapped;
   const avatarState = isSpeaking
     ? "speaking"
     : status === "thinking" || status === "transcribing"
@@ -117,9 +121,19 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               )}
 
               {status === "error" && (
-                <p className="text-sm text-red-400">
-                  Something went wrong. Try again?
-                </p>
+                <div className="flex items-center gap-2 text-sm text-red-400">
+                  <span>{error}</span>
+                  <button
+                    onClick={retryLastMessage}
+                    className="underline hover:text-red-300 transition-colors duration-200 shrink-0"
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
+
+              {isCapped && (
+                <p className="text-sm text-gray-400">{error}</p>
               )}
             </div>
 
@@ -131,8 +145,10 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={isRecording ? "Listening..." : "Ask a question..."}
-                disabled={isRecording}
+                placeholder={
+                  isRecording ? "Listening..." : isCapped ? "Session complete" : "Ask a question..."
+                }
+                disabled={isRecording || isCapped}
                 className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-500 accent-focus focus:outline-none disabled:opacity-50"
               />
               <button

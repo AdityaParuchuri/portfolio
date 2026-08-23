@@ -7,13 +7,25 @@ export interface ChatTurn {
   content: string;
 }
 
-type ChatStatus = "idle" | "recording" | "transcribing" | "thinking" | "streaming" | "error";
+type ChatStatus =
+  | "idle"
+  | "recording"
+  | "transcribing"
+  | "thinking"
+  | "streaming"
+  | "error"
+  | "capped";
 
 interface ChatState {
   messages: ChatTurn[];
   status: ChatStatus;
   error: string | null;
 }
+
+const MAX_USER_TURNS = 15;
+const CAP_MESSAGE =
+  "We've covered a lot of ground! Feel free to explore the rest of the portfolio -- reload the page if you'd like to start a fresh conversation.";
+const RATE_LIMIT_MESSAGE = "I'm getting a lot of questions right now -- try again in a bit!";
 
 type ChatAction =
   | { type: "send"; text: string }
@@ -22,6 +34,7 @@ type ChatAction =
   | { type: "recordingStart" }
   | { type: "transcribing" }
   | { type: "reset" }
+  | { type: "capped" }
   | { type: "error"; message: string };
 
 function reducer(state: ChatState, action: ChatAction): ChatState {
@@ -51,6 +64,8 @@ function reducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, status: "transcribing" };
     case "reset":
       return { ...state, status: "idle" };
+    case "capped":
+      return { ...state, status: "capped", error: CAP_MESSAGE };
     case "error":
       return { ...state, status: "error", error: action.message };
   }
@@ -68,6 +83,7 @@ export function useVirtualMeChat() {
   const chunksRef = useRef<Blob[]>([]);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const lastAttemptedTextRef = useRef<string>("");
 
   const playSpeech = useCallback(async (text: string) => {
     if (!text.trim()) return;
@@ -116,6 +132,13 @@ export function useVirtualMeChat() {
       const trimmed = text.trim();
       if (!trimmed) return;
 
+      const userTurnCount = state.messages.filter((m) => m.role === "user").length;
+      if (userTurnCount >= MAX_USER_TURNS) {
+        dispatch({ type: "capped" });
+        return;
+      }
+
+      lastAttemptedTextRef.current = trimmed;
       const nextMessages: ChatTurn[] = [...state.messages, { role: "user", content: trimmed }];
       dispatch({ type: "send", text: trimmed });
 
@@ -126,6 +149,10 @@ export function useVirtualMeChat() {
           body: JSON.stringify({ messages: nextMessages }),
         });
 
+        if (response.status === 429) {
+          dispatch({ type: "error", message: RATE_LIMIT_MESSAGE });
+          return;
+        }
         if (!response.ok || !response.body) {
           throw new Error(`Request failed: ${response.status}`);
         }
@@ -164,6 +191,12 @@ export function useVirtualMeChat() {
     },
     [state.messages, playSpeech]
   );
+
+  const retryLastMessage = useCallback(() => {
+    if (lastAttemptedTextRef.current) {
+      void sendMessage(lastAttemptedTextRef.current);
+    }
+  }, [sendMessage]);
 
   const startRecording = useCallback(async () => {
     setMicError(null);
@@ -220,6 +253,7 @@ export function useVirtualMeChat() {
     isSpeaking,
     analyserRef,
     sendMessage,
+    retryLastMessage,
     startRecording,
     stopRecording,
   };
