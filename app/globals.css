@@ -223,6 +223,15 @@ body {
   display: none; /* Chrome / Safari / Opera */
 }
 
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome / Safari / Opera */
+}
+
 @keyframes popPulse {
   0%, 100% {
     transform: scale(1);

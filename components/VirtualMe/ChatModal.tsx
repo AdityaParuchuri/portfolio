@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Mic, Send, Square, X } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useVirtualMeChat } from "./useVirtualMeChat";
 import AudioReactiveAvatar from "./AudioReactiveAvatar";
 
@@ -25,6 +25,24 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     stopRecording,
   } = useVirtualMeChat();
   const [input, setInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    isNearBottomRef.current = distanceFromBottom < 60;
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !isNearBottomRef.current) return;
+    // Instant, not smooth: a smooth scroll fires onScroll events mid-animation,
+    // which handleScroll reads as the user having scrolled away, incorrectly
+    // suppressing the next auto-scroll during rapid token-by-token streaming.
+    el.scrollTop = el.scrollHeight;
+  }, [messages, status]);
 
   const isRecording = status === "recording";
   const isCapped = status === "capped";
@@ -85,7 +103,11 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
 
             <AudioReactiveAvatar state={avatarState} analyserRef={analyserRef} />
 
-            <div className="space-y-3 max-h-80 overflow-y-auto mb-4 pr-1">
+            <div
+              ref={scrollRef}
+              onScroll={handleScroll}
+              className="space-y-3 max-h-80 overflow-y-auto mb-4 pr-1 no-scrollbar"
+            >
               {messages.length === 0 && status !== "thinking" && (
                 <p className="text-sm text-gray-400">
                   Ask me anything about my background, projects, or experience.
