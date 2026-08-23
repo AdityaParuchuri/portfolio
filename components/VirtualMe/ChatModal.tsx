@@ -51,7 +51,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+          className="fixed inset-0 z-[60] flex items-start justify-center pt-[10vh] sm:pt-[14vh] bg-black/80 backdrop-blur-sm px-4"
           onClick={onClose}
         >
           <motion.div

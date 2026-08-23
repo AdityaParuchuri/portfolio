@@ -30,11 +30,13 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <AnimatePresence>
-            {!isModalOpen && (
-              <AvatarTrigger key="avatar-trigger" onOpen={() => setIsModalOpen(true)} />
-            )}
-          </AnimatePresence>
+          <div className="mb-6 h-[150px] md:h-[190px] flex items-center justify-center">
+            <AnimatePresence>
+              {!isModalOpen && (
+                <AvatarTrigger key="avatar-trigger" onOpen={() => setIsModalOpen(true)} />
+              )}
+            </AnimatePresence>
+          </div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
