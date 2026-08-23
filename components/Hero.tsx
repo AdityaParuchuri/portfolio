@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
 import SpotlightGrid from "./SpotlightGrid";
@@ -30,7 +30,13 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <AvatarTrigger onOpen={() => setIsModalOpen(true)} />
+          <div className="mb-6 h-[150px] md:h-[190px] flex items-center justify-center">
+            <AnimatePresence>
+              {!isModalOpen && (
+                <AvatarTrigger key="avatar-trigger" onOpen={() => setIsModalOpen(true)} />
+              )}
+            </AnimatePresence>
+          </div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
