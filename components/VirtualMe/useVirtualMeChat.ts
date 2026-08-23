@@ -7,7 +7,7 @@ export interface ChatTurn {
   content: string;
 }
 
-type ChatStatus = "idle" | "thinking" | "streaming" | "error" | "capped";
+type ChatStatus = "idle" | "thinking" | "streaming" | "error" | "capped" | "unavailable";
 
 interface ChatState {
   messages: ChatTurn[];
@@ -19,12 +19,15 @@ const MAX_USER_TURNS = 15;
 const CAP_MESSAGE =
   "We've covered a lot of ground! Feel free to explore the rest of the portfolio -- reload the page if you'd like to start a fresh conversation.";
 const RATE_LIMIT_MESSAGE = "I'm getting a lot of questions right now -- try again in a bit!";
+const QUOTA_EXHAUSTED_MESSAGE =
+  "I've hit my AI usage limit for today -- please check back later!";
 
 type ChatAction =
   | { type: "send"; text: string }
   | { type: "assistantDelta"; text: string }
   | { type: "assistantDone" }
   | { type: "capped" }
+  | { type: "unavailable" }
   | { type: "error"; message: string };
 
 function reducer(state: ChatState, action: ChatAction): ChatState {
@@ -50,6 +53,8 @@ function reducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, status: "idle" };
     case "capped":
       return { ...state, status: "capped", error: CAP_MESSAGE };
+    case "unavailable":
+      return { ...state, status: "unavailable", error: QUOTA_EXHAUSTED_MESSAGE };
     case "error":
       return { ...state, status: "error", error: action.message };
   }
@@ -87,6 +92,10 @@ export function useVirtualMeChat() {
 
         if (response.status === 429) {
           dispatch({ type: "error", message: RATE_LIMIT_MESSAGE });
+          return;
+        }
+        if (response.status === 503) {
+          dispatch({ type: "unavailable" });
           return;
         }
         if (!response.ok || !response.body) {
