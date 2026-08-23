@@ -106,7 +106,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             <div
               ref={scrollRef}
               onScroll={handleScroll}
-              className="space-y-3 max-h-80 overflow-y-auto mb-4 pr-1"
+              className="space-y-3 max-h-80 overflow-y-auto mb-4 pr-1 no-scrollbar"
             >
               {messages.length === 0 && status !== "thinking" && (
                 <p className="text-sm text-gray-400">
