@@ -1,10 +1,14 @@
-import { exports } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
+import { rateLimitKey } from "../lib/rateLimit";
 
-function postChat(messages: { role: "user" | "assistant"; content: string }[]) {
+function postChat(
+  messages: { role: "user" | "assistant"; content: string }[],
+  headers: Record<string, string> = {}
+) {
   return exports.default.fetch("http://example.com/api/chat", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify({ messages }),
   });
 }
@@ -52,4 +56,19 @@ describe("/api/chat", () => {
     const { done } = await collectNdjson(response);
     expect(done.fullText.toLowerCase()).toContain("plaid");
   }, 30000);
+
+  it("returns 429 without calling AI once the per-IP hourly limit is reached", async () => {
+    const testIp = `test-limit-${crypto.randomUUID()}`;
+    const key = rateLimitKey(testIp, new Date());
+    await env.RATE_LIMIT_KV.put(key, "20", { expirationTtl: 3600 });
+
+    const response = await postChat(
+      [{ role: "user", content: "hi" }],
+      { "cf-connecting-ip": testIp }
+    );
+
+    expect(response.status).toBe(429);
+    const data = (await response.json()) as { error: string };
+    expect(data.error).toBe("rate_limited");
+  });
 });
