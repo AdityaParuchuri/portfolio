@@ -1,7 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { Send, X } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { useVirtualMeChat } from "./useVirtualMeChat";
 
 interface ChatModalProps {
   isOpen: boolean;
@@ -9,6 +11,16 @@ interface ChatModalProps {
 }
 
 export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
+  const { messages, status, sendMessage } = useVirtualMeChat();
+  const [input, setInput] = useState("");
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || status === "thinking") return;
+    sendMessage(input);
+    setInput("");
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -40,7 +52,55 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-sm text-gray-400">Chat coming soon.</p>
+
+            <div className="space-y-3 max-h-80 overflow-y-auto mb-4 pr-1">
+              {messages.length === 0 && status !== "thinking" && (
+                <p className="text-sm text-gray-400">
+                  Ask me anything about my background, projects, or experience.
+                </p>
+              )}
+
+              {messages.map((turn, i) => (
+                <div key={i} className={turn.role === "user" ? "text-right" : "text-left"}>
+                  <p
+                    className={`inline-block px-3 py-2 rounded-lg text-sm max-w-[85%] text-left ${
+                      turn.role === "user"
+                        ? "glass"
+                        : "accent-gradient-soft accent-text"
+                    }`}
+                  >
+                    {turn.content}
+                  </p>
+                </div>
+              ))}
+
+              {status === "thinking" && (
+                <p className="text-sm text-gray-400">Thinking...</p>
+              )}
+
+              {status === "error" && (
+                <p className="text-sm text-red-400">
+                  Something went wrong. Try again?
+                </p>
+              )}
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask a question..."
+                className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-500 accent-focus focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={status === "thinking"}
+                className="btn-accent-solid rounded-lg px-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Send"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
           </motion.div>
         </motion.div>
       )}
