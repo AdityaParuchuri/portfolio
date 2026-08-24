@@ -21,6 +21,7 @@ interface FakeRow {
   city: string | null;
   region: string | null;
   visitor_hash: string;
+  referrer: string | null;
 }
 
 function createFakeDb(rows: FakeRow[] = []) {
@@ -31,15 +32,16 @@ function createFakeDb(rows: FakeRow[] = []) {
           return {
             async run() {
               if (query.startsWith("INSERT")) {
-                const [visited_at, path, country, city, region, visitor_hash] = values as [
+                const [visited_at, path, country, city, region, visitor_hash, referrer] = values as [
                   string,
                   string,
                   string | null,
                   string | null,
                   string | null,
-                  string
+                  string,
+                  string | null
                 ];
-                rows.push({ visited_at, path, country, city, region, visitor_hash });
+                rows.push({ visited_at, path, country, city, region, visitor_hash, referrer });
               } else if (query.startsWith("DELETE")) {
                 const [cutoff] = values as [string];
                 for (let i = rows.length - 1; i >= 0; i--) {
@@ -95,6 +97,24 @@ describe("logVisit (fake kv/db)", () => {
     expect(rows[0]).toMatchObject({ path: "/", country: "US", city: "Boston", region: "MA" });
   });
 
+  it("records the referrer when one is provided", async () => {
+    const kv = createFakeKv();
+    const { db, rows } = createFakeDb();
+
+    await logVisit({ db, kv, ip: "1.2.3.4", salt: "salt", path: "/", referrer: "https://google.com/search", now });
+
+    expect(rows[0].referrer).toBe("https://google.com/search");
+  });
+
+  it("stores a null referrer when none is provided", async () => {
+    const kv = createFakeKv();
+    const { db, rows } = createFakeDb();
+
+    await logVisit({ db, kv, ip: "1.2.3.4", salt: "salt", path: "/", now });
+
+    expect(rows[0].referrer).toBeNull();
+  });
+
   it("skips a second visit from the same ip on the same day", async () => {
     const kv = createFakeKv();
     const { db, rows } = createFakeDb();
@@ -130,7 +150,7 @@ describe("logVisit (fake kv/db)", () => {
     const kv = createFakeKv();
     const staleDate = new Date(now.getTime() - 91 * 24 * 60 * 60 * 1000).toISOString();
     const { db, rows } = createFakeDb([
-      { visited_at: staleDate, path: "/", country: null, city: null, region: null, visitor_hash: "old" },
+      { visited_at: staleDate, path: "/", country: null, city: null, region: null, visitor_hash: "old", referrer: null },
     ]);
 
     await logVisit({ db, kv, ip: "1.2.3.4", salt: "salt", path: "/", now });
@@ -151,6 +171,7 @@ describe("logVisit (real Cloudflare bindings)", () => {
       salt: "test-salt",
       path: "/",
       geo: { country: "US", city: "Boston", region: "MA" },
+      referrer: "https://google.com/search",
       now,
     });
 
@@ -162,6 +183,12 @@ describe("logVisit (real Cloudflare bindings)", () => {
       .all();
 
     expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({ path: "/", country: "US", city: "Boston", region: "MA" });
+    expect(results[0]).toMatchObject({
+      path: "/",
+      country: "US",
+      city: "Boston",
+      region: "MA",
+      referrer: "https://google.com/search",
+    });
   });
 });
