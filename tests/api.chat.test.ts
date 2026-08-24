@@ -1,6 +1,7 @@
 import { env, exports } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 import { rateLimitKey } from "../lib/rateLimit";
+import { hashVisitor } from "../lib/visitLog";
 
 function postChat(
   messages: { role: "user" | "assistant"; content: string }[],
@@ -55,6 +56,39 @@ describe("/api/chat", () => {
 
     const { done } = await collectNdjson(response);
     expect(done.fullText.toLowerCase()).toContain("plaid");
+  }, 30000);
+
+  it("logs the turn to chat_messages once the stream completes", async () => {
+    const testIp = `test-chatlog-${crypto.randomUUID()}`;
+    const question = `What do you do for work? (${crypto.randomUUID()})`;
+
+    const response = await postChat(
+      [{ role: "user", content: question }],
+      { "cf-connecting-ip": testIp }
+    );
+    expect(response.status).toBe(200);
+    const { done } = await collectNdjson(response);
+
+    const expectedHash = await hashVisitor(testIp, env.VISITOR_HASH_SALT);
+
+    // The D1 write happens in ctx.waitUntil after the stream closes, so poll
+    // briefly rather than assuming it's landed the instant the body drains.
+    let results: unknown[] = [];
+    for (let attempt = 0; attempt < 20; attempt++) {
+      ({ results } = await env.VISITS_DB.prepare(
+        "SELECT * FROM chat_messages WHERE visitor_hash = ?"
+      )
+        .bind(expectedHash)
+        .all());
+      if (results.length > 0) break;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({
+      user_message: question,
+      assistant_response: done.fullText,
+    });
   }, 30000);
 
   it("returns 429 without calling AI once the per-IP hourly limit is reached", async () => {

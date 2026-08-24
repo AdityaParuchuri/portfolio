@@ -30,7 +30,10 @@ export function parseWorkersAiSseLine(line: string): ParsedChunk | null {
  * one `{"delta":"..."}` line per token, then a final
  * `{"done":true,"fullText":"..."}` line. Keeps the client off SSE parsing.
  */
-export function toNdjsonStream(aiStream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+export function toNdjsonStream(
+  aiStream: ReadableStream<Uint8Array>,
+  onComplete?: (fullText: string) => void
+): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let buffer = "";
@@ -66,6 +69,7 @@ export function toNdjsonStream(aiStream: ReadableStream<Uint8Array>): ReadableSt
         }
         if (buffer) flushLine(buffer);
       } finally {
+        onComplete?.(fullText);
         controller.close();
       }
     },

@@ -2,6 +2,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { buildSystemPrompt } from "@/lib/persona";
 import { toNdjsonStream } from "@/lib/aiStream";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { logChatTurn } from "@/lib/chatLog";
 
 const CHAT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
@@ -11,7 +12,7 @@ interface ChatMessage {
 }
 
 export async function POST(request: Request) {
-  const { env } = await getCloudflareContext();
+  const { env, ctx } = await getCloudflareContext();
 
   const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
   const rateLimit = await checkRateLimit(env.RATE_LIMIT_KV, ip);
@@ -30,9 +31,23 @@ export async function POST(request: Request) {
       stream: true,
     });
 
-    return new Response(toNdjsonStream(aiStream), {
-      headers: { "content-type": "application/x-ndjson" },
-    });
+    const userMessage = messages[messages.length - 1]?.content ?? "";
+
+    return new Response(
+      toNdjsonStream(aiStream, (fullText) => {
+        if (!userMessage || !fullText) return;
+        ctx.waitUntil(
+          logChatTurn({
+            db: env.VISITS_DB,
+            ip,
+            salt: env.VISITOR_HASH_SALT,
+            userMessage,
+            assistantResponse: fullText,
+          })
+        );
+      }),
+      { headers: { "content-type": "application/x-ndjson" } }
+    );
   } catch (error) {
     // Workers AI's free tier caps out at 10,000 neurons/day account-wide; once
     // hit, env.AI.run throws rather than returning a normal response. Surface

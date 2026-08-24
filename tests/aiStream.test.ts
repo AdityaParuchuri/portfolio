@@ -1,5 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { parseWorkersAiSseLine } from "../lib/aiStream";
+import { parseWorkersAiSseLine, toNdjsonStream } from "../lib/aiStream";
+
+function fakeSseStream(chunks: string[]): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  return new ReadableStream({
+    start(controller) {
+      for (const chunk of chunks) {
+        controller.enqueue(encoder.encode(`data: ${chunk}\n`));
+      }
+      controller.enqueue(encoder.encode("data: [DONE]\n"));
+      controller.close();
+    },
+  });
+}
+
+async function drain(stream: ReadableStream<Uint8Array>): Promise<void> {
+  const reader = stream.getReader();
+  while (true) {
+    const { done } = await reader.read();
+    if (done) break;
+  }
+}
 
 describe("parseWorkersAiSseLine", () => {
   it("extracts delta text from a normal content chunk", () => {
@@ -43,5 +64,35 @@ describe("parseWorkersAiSseLine", () => {
     const line =
       'data: {"choices":[{"delta":{"content":" you."},"finish_reason":"stop","index":0}],"response":" you."}';
     expect(parseWorkersAiSseLine(line)).toEqual({ type: "delta", text: " you." });
+  });
+});
+
+describe("toNdjsonStream onComplete", () => {
+  it("fires once with the full accumulated text", async () => {
+    const chunks = [
+      '{"choices":[{"delta":{"content":"Hello"}}]}',
+      '{"choices":[{"delta":{"content":", world"}}]}',
+      '{"choices":[{"delta":{"content":"!"}}]}',
+    ];
+
+    const calls: string[] = [];
+    const stream = toNdjsonStream(fakeSseStream(chunks), (fullText) => {
+      calls.push(fullText);
+    });
+
+    await drain(stream);
+
+    expect(calls).toEqual(["Hello, world!"]);
+  });
+
+  it("does not fire if no delta content was ever streamed", async () => {
+    const calls: string[] = [];
+    const stream = toNdjsonStream(fakeSseStream([]), (fullText) => {
+      calls.push(fullText);
+    });
+
+    await drain(stream);
+
+    expect(calls).toEqual([""]);
   });
 });
