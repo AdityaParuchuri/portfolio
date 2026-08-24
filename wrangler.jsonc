@@ -26,5 +26,12 @@
       "binding": "RATE_LIMIT_KV",
       "id": "a2832c3c01c745f09c1c711a9936f16e"
     }
+  ],
+  "d1_databases": [
+    {
+      "binding": "VISITS_DB",
+      "database_name": "portfolio-visits",
+      "database_id": "855e1e02-0c7f-44ec-9193-4e41463ca0e5"
+    }
   ]
 }
