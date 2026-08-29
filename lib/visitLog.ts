@@ -17,6 +17,8 @@ export interface VisitGeo {
   country?: string;
   city?: string;
   region?: string;
+  asn?: number;
+  asOrganization?: string;
 }
 
 export interface LogVisitParams {
@@ -68,7 +70,7 @@ export async function logVisit({
 
   await db
     .prepare(
-      "INSERT INTO visits (visited_at, path, country, city, region, visitor_hash, referrer) VALUES (?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO visits (visited_at, path, country, city, region, visitor_hash, referrer, asn, as_organization) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     .bind(
       now.toISOString(),
@@ -77,7 +79,9 @@ export async function logVisit({
       geo?.city ?? null,
       geo?.region ?? null,
       visitorHash,
-      referrer ?? null
+      referrer ?? null,
+      geo?.asn ?? null,
+      geo?.asOrganization ?? null
     )
     .run();
 
