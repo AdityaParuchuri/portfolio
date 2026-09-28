@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
   /*
     Active palette: sawad-inspired (warm neutral + soft gold accents)
     To switch themes quickly, replace these six accent vars + two background vars.
@@ -45,6 +47,32 @@
   --particle-color: var(--accent-primary);
   --connection-color: var(--accent-secondary);
   --glow-color: rgba(var(--accent-primary-rgb), 0.5);
+  /* "Ink" color for text and translucent overlays (see tailwind `fg`).
+     Space-separated so rgb(var(--fg-rgb) / <alpha>) is valid CSS. */
+  --fg-rgb: 234 240 247;
+  --glass-bg: rgba(255, 255, 255, 0.025);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --grid-bit-rgb: 100, 100, 120;
+}
+
+/* Light theme: same blue-slate hue as dark, luminance inverted. Accents are
+   darkened so they hold >= 4.5:1 against the light backgrounds. */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-primary: #f6f8fb;
+  --bg-secondary: #e7ecf3;
+  --text-primary: #0f1720;
+  --text-secondary: #4b5a6e;
+  --accent-primary: #3b62a8;
+  --accent-primary-strong: #2f5299;
+  --accent-secondary: #5b7196;
+  --accent-secondary-strong: #4d6285;
+  --accent-primary-rgb: 59, 98, 168;
+  --accent-secondary-rgb: 91, 113, 150;
+  --fg-rgb: 15 23 42;
+  --glass-bg: rgba(15, 23, 42, 0.035);
+  --glass-border: rgba(15, 23, 42, 0.1);
+  --grid-bit-rgb: 120, 135, 160;
 }
 
 * {
@@ -155,9 +183,9 @@ body {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
 }
 
 /* Same glass treatment, but with a near-opaque background -- for panels

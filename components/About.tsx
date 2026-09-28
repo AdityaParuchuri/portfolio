@@ -210,7 +210,7 @@ export default function About() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-gray-400 leading-relaxed text-center w-full mb-4"
+            className="text-fg/65 leading-relaxed text-center w-full mb-4"
           >
             {bio}
           </motion.p>
@@ -229,7 +229,7 @@ export default function About() {
               onClick={() => scroll("left")}
               animate={{ opacity: canScrollLeft ? 1 : 0, pointerEvents: canScrollLeft ? "auto" : "none" }}
               transition={{ duration: 0.2 }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 -translate-x-3 glass border border-white/10 hover-accent-border rounded-full p-2 text-gray-400 hover:text-white hover-accent-shadow transition-colors duration-200"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 -translate-x-3 glass border border-fg/10 hover-accent-border rounded-full p-2 text-fg/65 hover:text-fg hover-accent-shadow transition-colors duration-200"
             >
               <ChevronLeft className="w-5 h-5" />
             </motion.button>
@@ -240,7 +240,7 @@ export default function About() {
               onClick={() => scroll("right")}
               animate={{ opacity: canScrollRight ? 1 : 0, pointerEvents: canScrollRight ? "auto" : "none" }}
               transition={{ duration: 0.2 }}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 translate-x-3 glass border border-white/10 hover-accent-border rounded-full p-2 text-gray-400 hover:text-white hover-accent-shadow transition-colors duration-200"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 translate-x-3 glass border border-fg/10 hover-accent-border rounded-full p-2 text-fg/65 hover:text-fg hover-accent-shadow transition-colors duration-200"
             >
               <ChevronRight className="w-5 h-5" />
             </motion.button>
@@ -307,18 +307,18 @@ export default function About() {
                           ref={(el) => {
                             cardContentRefs.current[index] = el;
                           }}
-                          className="glass rounded-xl p-3 md:p-4 w-full border border-white/10 hover-accent-border transition-all duration-300 hover-accent-shadow"
+                          className="glass rounded-xl p-3 md:p-4 w-full border border-fg/10 hover-accent-border transition-all duration-300 hover-accent-shadow"
                         >
                           <span className="inline-block px-2 py-0.5 text-xs font-semibold rounded-full accent-gradient-soft accent-text mb-2">
                             {item.year}
                           </span>
-                          <h4 className="font-semibold text-white text-sm mb-1">{item.title}</h4>
+                          <h4 className="font-semibold text-fg text-sm mb-1">{item.title}</h4>
                           <p className="accent-text-soft text-xs font-medium mb-1">{item.organization}</p>
-                          <p className="text-gray-400 text-xs leading-relaxed mb-2">{item.description}</p>
+                          <p className="text-fg/65 text-xs leading-relaxed mb-2">{item.description}</p>
                           {item.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {item.tags.map((tag) => (
-                                <span key={tag} className="px-2 py-0.5 text-xs bg-white/5 rounded border border-white/10 text-gray-400">
+                                <span key={tag} className="px-2 py-0.5 text-xs bg-fg/5 rounded border border-fg/10 text-fg/65">
                                   {tag}
                                 </span>
                               ))}
@@ -366,7 +366,7 @@ export default function About() {
                   ].map((tech) => (
                     <motion.div
                       key={`${tech.name}-${setIdx}`}
-                      className="group flex flex-col items-center gap-3 shrink-0 p-5 rounded-2xl glass border border-white/10 hover-accent-border transition-all duration-300 hover-accent-shadow hover:-translate-y-1 cursor-default"
+                      className="group flex flex-col items-center gap-3 shrink-0 p-5 rounded-2xl glass border border-fg/10 hover-accent-border transition-all duration-300 hover-accent-shadow hover:-translate-y-1 cursor-default"
                       whileHover={{ scale: 1.05 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     >
@@ -381,7 +381,7 @@ export default function About() {
                           className="h-14 w-14 object-contain opacity-90 group-hover:opacity-100 transition-opacity"
                         />
                       </motion.div>
-                      <span className="text-sm font-medium text-gray-400 group-hover:text-gray-200 transition-colors">
+                      <span className="text-sm font-medium text-fg/65 group-hover:text-fg/85 transition-colors">
                         {tech.name}
                       </span>
                     </motion.div>

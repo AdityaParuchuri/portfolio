@@ -60,7 +60,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="glass glass-solid w-full max-w-md rounded-2xl border border-white/10 p-6"
+            className="glass glass-solid w-full max-w-md rounded-2xl border border-fg/10 p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -69,7 +69,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               </h3>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors duration-200"
+                className="p-1.5 rounded-lg hover:bg-fg/10 transition-colors duration-200"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
@@ -84,7 +84,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               className="space-y-3 max-h-80 overflow-y-auto mb-4 pr-1 no-scrollbar"
             >
               {messages.length === 0 && status !== "thinking" && (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-fg/65">
                   Ask me anything about my background, projects, or experience.
                 </p>
               )}
@@ -104,18 +104,18 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               ))}
 
               {status === "thinking" && (
-                <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="flex items-center gap-2 text-sm text-fg/65">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Thinking...</span>
                 </div>
               )}
 
               {status === "error" && (
-                <div className="flex items-center gap-2 text-sm text-red-400">
+                <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
                   <span>{error}</span>
                   <button
                     onClick={retryLastMessage}
-                    className="underline hover:text-red-300 transition-colors duration-200 shrink-0"
+                    className="underline hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200 shrink-0"
                   >
                     Try again
                   </button>
@@ -123,7 +123,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               )}
 
               {(isCapped || isUnavailable) && (
-                <p className="text-sm text-gray-400">{error}</p>
+                <p className="text-sm text-fg/65">{error}</p>
               )}
             </div>
 
@@ -135,7 +135,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                   isCapped ? "Session complete" : isUnavailable ? "Unavailable right now" : "Ask a question..."
                 }
                 disabled={isCapped || isUnavailable}
-                className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-500 accent-focus focus:outline-none disabled:opacity-50"
+                className="flex-1 rounded-lg bg-fg/5 border border-fg/10 px-3 py-2 text-sm text-fg placeholder:text-fg/60 accent-focus focus:outline-none disabled:opacity-50"
               />
               <button
                 type="submit"

@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 const DEFAULT_BG_COLOR = "#0a0a0f";
-const BIT_BASE = "rgba(100, 100, 120, 0.3)";
+const DEFAULT_BIT_RGB: [number, number, number] = [100, 100, 120];
+const BIT_BASE_ALPHA = 0.3;
 const DEFAULT_ACCENT_RGB: [number, number, number] = [96, 165, 250];
 const DEFAULT_GLOW_COLOR = "rgba(96, 165, 250, 0.4)";
 const BIT_SPACING = 40;
@@ -18,16 +19,16 @@ const getThemeColor = (name: string, fallback: string) => {
   return value || fallback;
 };
 
-const getAccentRgb = (): [number, number, number] => {
-  const rgbRaw = getThemeColor(
-    "--accent-primary-rgb",
-    DEFAULT_ACCENT_RGB.join(", ")
-  );
+const getRgbVar = (
+  name: string,
+  fallback: [number, number, number]
+): [number, number, number] => {
+  const rgbRaw = getThemeColor(name, fallback.join(", "));
   const parsed = rgbRaw
     .split(",")
     .map((value) => Number(value.trim()))
     .filter((value) => !Number.isNaN(value));
-  if (parsed.length !== 3) return DEFAULT_ACCENT_RGB;
+  if (parsed.length !== 3) return fallback;
   return [parsed[0], parsed[1], parsed[2]];
 };
 
@@ -95,7 +96,9 @@ export default function SpotlightGrid() {
         return;
       }
 
-      const accentRgb = getAccentRgb();
+      const accentRgb = getRgbVar("--accent-primary-rgb", DEFAULT_ACCENT_RGB);
+      const bitRgb = getRgbVar("--grid-bit-rgb", DEFAULT_BIT_RGB);
+      const bitBase = `rgba(${bitRgb.join(", ")}, ${BIT_BASE_ALPHA})`;
       const glowColor = getThemeColor("--glow-color", DEFAULT_GLOW_COLOR);
       const bgColor = getThemeColor("--bg-primary", DEFAULT_BG_COLOR);
       ctx.fillStyle = bgColor;
@@ -115,16 +118,17 @@ export default function SpotlightGrid() {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         let fontSize = BASE_FONT_SIZE;
-        let color = BIT_BASE;
+        let color = bitBase;
 
         if (distance < SPOTLIGHT_RADIUS) {
           const intensity = 1 - distance / SPOTLIGHT_RADIUS;
           fontSize = BASE_FONT_SIZE + intensity * 8;
-          const opacity = 0.3 + intensity * 0.7;
+          const opacity = BIT_BASE_ALPHA + intensity * (1 - BIT_BASE_ALPHA);
 
-          const r = Math.round(100 + intensity * Math.max(0, accentRgb[0] - 100));
-          const g = Math.round(100 + intensity * Math.max(0, accentRgb[1] - 100));
-          const b = Math.round(120 + intensity * Math.max(0, accentRgb[2] - 120));
+          // Blend from the theme's idle color toward the accent.
+          const [r, g, b] = bitRgb.map((base, i) =>
+            Math.round(base + intensity * (accentRgb[i] - base))
+          );
           color = `rgba(${r}, ${g}, ${b}, ${opacity})`;
 
           if (distance < SPOTLIGHT_RADIUS * 0.3) {

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -47,7 +48,7 @@ export default function Navigation() {
                 alt="AP Logo"
                 width={96}
                 height={96}
-                className="h-[72px] w-[72px] md:h-[80px] md:w-[80px] object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]"
+                className="h-[72px] w-[72px] md:h-[80px] md:w-[80px] object-contain transition-all duration-300 [[data-theme=light]_&]:invert group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]"
               />
             </button>
           </div>
@@ -58,18 +59,20 @@ export default function Navigation() {
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
-                  className="text-gray-300 hover:text-white transition-colors duration-200"
+                  className="text-fg/85 hover:text-fg transition-colors duration-200"
                 >
                   {item}
                 </button>
               ))}
+              <ThemeToggle />
             </div>
           </div>
 
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center gap-3">
+            <ThemeToggle />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg glass hover:bg-white/10 transition-colors duration-200"
+              className="p-2 rounded-lg glass hover:bg-fg/10 transition-colors duration-200"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
@@ -96,7 +99,7 @@ export default function Navigation() {
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
-                  className="block w-full text-left px-3 py-2 rounded-md text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-200"
+                  className="block w-full text-left px-3 py-2 rounded-md text-fg/85 hover:text-fg hover:bg-fg/10 transition-colors duration-200"
                 >
                   {item}
                 </button>

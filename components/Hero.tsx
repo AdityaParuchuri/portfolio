@@ -51,7 +51,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="text-3xl md:text-5xl lg:text-6xl font-semibold text-gray-300 mb-8"
+            className="text-3xl md:text-5xl lg:text-6xl font-semibold text-fg/85 mb-8"
           >
             Full-Stack Software Engineer
           </motion.h2>
@@ -86,7 +86,7 @@ export default function Hero() {
               href="https://github.com/AdityaParuchuri"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3 glass rounded-lg hover:bg-white/10 transition-all duration-300 hover:scale-110"
+              className="p-3 glass rounded-lg hover:bg-fg/10 transition-all duration-300 hover:scale-110"
               aria-label="GitHub"
             >
               <Github className="w-6 h-6" />
@@ -95,14 +95,14 @@ export default function Hero() {
               href="https://www.linkedin.com/in/aditya-paruchuri/"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3 glass rounded-lg hover:bg-white/10 transition-all duration-300 hover:scale-110"
+              className="p-3 glass rounded-lg hover:bg-fg/10 transition-all duration-300 hover:scale-110"
               aria-label="LinkedIn"
             >
               <Linkedin className="w-6 h-6" />
             </a>
             <a
               href="mailto:saiaditya.paruchuri@gmail.com"
-              className="p-3 glass rounded-lg hover:bg-white/10 transition-all duration-300 hover:scale-110"
+              className="p-3 glass rounded-lg hover:bg-fg/10 transition-all duration-300 hover:scale-110"
               aria-label="Email"
             >
               <Mail className="w-6 h-6" />
@@ -119,7 +119,7 @@ export default function Hero() {
       >
         <button
           onClick={() => scrollToSection("about")}
-          className="animate-bounce p-2 rounded-full glass hover:bg-white/10 transition-colors duration-300"
+          className="animate-bounce p-2 rounded-full glass hover:bg-fg/10 transition-colors duration-300"
           aria-label="Scroll to next section"
         >
           <ArrowDown className="w-6 h-6" />
