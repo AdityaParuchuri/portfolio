@@ -17,6 +17,8 @@ export async function middleware(request: NextRequest) {
         country: cf?.country as string | undefined,
         city: cf?.city as string | undefined,
         region: cf?.region as string | undefined,
+        asn: cf?.asn as number | undefined,
+        asOrganization: cf?.asOrganization as string | undefined,
       },
       referrer: request.headers.get("referer") ?? undefined,
     })

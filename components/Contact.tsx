@@ -102,7 +102,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="scroll-mt-8 md:scroll-mt-10 min-h-screen pt-8 md:pt-10 pb-8 md:pb-10 relative bg-[var(--bg-primary)]"
+      className="scroll-mt-8 md:scroll-mt-10 min-h-screen pt-8 md:pt-10 pb-8 md:pb-10 relative overflow-x-clip bg-[var(--bg-primary)]"
       ref={ref}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,7 +115,7 @@ export default function Contact() {
             <span className="gradient-text">Get In Touch</span>
           </h2>
           <div className="w-24 h-1 accent-gradient mx-auto mb-6" />
-          <p className="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
+          <p className="text-center text-fg/65 mb-16 max-w-2xl mx-auto">
             Want to work together, have a question or just want to say hi?
             Feel free to reach out!
           </p>
@@ -128,10 +128,10 @@ export default function Contact() {
               className="space-y-8"
             >
               <div>
-                <h3 className="text-2xl font-semibold mb-6 text-gray-200">
+                <h3 className="text-2xl font-semibold mb-6 text-fg/85">
                   Namasté!
                 </h3>
-                <p className="text-gray-400 leading-relaxed mb-8">
+                <p className="text-fg/65 leading-relaxed mb-8">
                   I&apos;m always up for a chat, work or otherwise. Drop a
                   message or reach out on my socials!
                 </p>
@@ -151,7 +151,7 @@ export default function Contact() {
                     href="https://www.linkedin.com/in/aditya-paruchuri/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover-accent-text transition-colors duration-300"
+                    className="text-fg/65 hover-accent-text transition-colors duration-300"
                   >
                     https://www.linkedin.com/in/aditya-paruchuri/
                   </a>
@@ -166,7 +166,7 @@ export default function Contact() {
                   </a>
                   <a
                     href="mailto:saiaditya.paruchuri@gmail.com"
-                    className="text-gray-400 hover-accent-secondary-text transition-colors duration-300"
+                    className="text-fg/65 hover-accent-secondary-text transition-colors duration-300"
                   >
                     saiaditya.paruchuri@gmail.com
                   </a>
@@ -175,11 +175,11 @@ export default function Contact() {
 
               <div className="hidden md:block">
                 <div className="glass p-8 rounded-xl">
-                  <p className="text-gray-300 italic">
+                  <p className="text-fg/85 italic">
                     &quot;The world will ask you who you are, and if you
                     don&apos;t know, the world will tell you.&quot;
                   </p>
-                  <p className="text-gray-500 text-sm mt-2">- Carl Jung</p>
+                  <p className="text-fg/60 text-sm mt-2">- Carl Jung</p>
                 </div>
               </div>
             </motion.div>
@@ -190,13 +190,13 @@ export default function Contact() {
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <form onSubmit={handleSubmit} className="space-y-6">
-                <p className="text-xs text-gray-500">* Required fields</p>
+                <p className="text-xs text-fg/60">* Required fields</p>
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-gray-300 mb-2 font-medium"
+                    className="block text-fg/85 mb-2 font-medium"
                   >
-                    Name <span className="text-white/90 text-[0.85em]">*</span>
+                    Name <span className="text-fg/90 text-[0.85em]">*</span>
                   </label>
                   <input
                     type="text"
@@ -206,20 +206,20 @@ export default function Contact() {
                     onChange={handleChange}
                     onBlur={() => handleBlur("name")}
                     required
-                    className="w-full px-4 py-3 glass rounded-lg focus:outline-none accent-focus bg-white/5 text-gray-200 placeholder-gray-500 transition-all duration-300"
+                    className="w-full px-4 py-3 glass rounded-lg focus:outline-none accent-focus bg-fg/5 text-fg/85 placeholder-fg/60 transition-all duration-300"
                     placeholder="Your Name"
                   />
                   {touched.name && trimmedName.length === 0 && (
-                    <p className="mt-2 text-xs text-red-400">Name is required.</p>
+                    <p className="mt-2 text-xs text-red-600 dark:text-red-400">Name is required.</p>
                   )}
                 </div>
 
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-gray-300 mb-2 font-medium"
+                    className="block text-fg/85 mb-2 font-medium"
                   >
-                    Email <span className="text-white/90 text-[0.85em]">*</span>
+                    Email <span className="text-fg/90 text-[0.85em]">*</span>
                   </label>
                   <input
                     type="email"
@@ -229,14 +229,14 @@ export default function Contact() {
                     onChange={handleChange}
                     onBlur={() => handleBlur("email")}
                     required
-                    className="w-full px-4 py-3 glass rounded-lg focus:outline-none accent-focus bg-white/5 text-gray-200 placeholder-gray-500 transition-all duration-300"
+                    className="w-full px-4 py-3 glass rounded-lg focus:outline-none accent-focus bg-fg/5 text-fg/85 placeholder-fg/60 transition-all duration-300"
                     placeholder="Your Email"
                   />
                   {touched.email && trimmedEmail.length === 0 && (
-                    <p className="mt-2 text-xs text-red-400">Email is required.</p>
+                    <p className="mt-2 text-xs text-red-600 dark:text-red-400">Email is required.</p>
                   )}
                   {trimmedEmail.length > 0 && !isEmailValid && (
-                    <p className="mt-2 text-xs text-amber-300">
+                    <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">
                       Please enter a valid email address (e.g. name@example.com).
                     </p>
                   )}
@@ -245,9 +245,9 @@ export default function Contact() {
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-gray-300 mb-2 font-medium"
+                    className="block text-fg/85 mb-2 font-medium"
                   >
-                    Message <span className="text-white/90 text-[0.85em]">*</span>
+                    Message <span className="text-fg/90 text-[0.85em]">*</span>
                   </label>
                   <textarea
                     id="message"
@@ -257,11 +257,11 @@ export default function Contact() {
                     onBlur={() => handleBlur("message")}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 glass rounded-lg focus:outline-none accent-focus bg-white/5 text-gray-200 placeholder-gray-500 transition-all duration-300 resize-none"
+                    className="w-full px-4 py-3 glass rounded-lg focus:outline-none accent-focus bg-fg/5 text-fg/85 placeholder-fg/60 transition-all duration-300 resize-none"
                     placeholder="Your Message"
                   />
                   {touched.message && trimmedMessage.length === 0 && (
-                    <p className="mt-2 text-xs text-red-400">Message is required.</p>
+                    <p className="mt-2 text-xs text-red-600 dark:text-red-400">Message is required.</p>
                   )}
                 </div>
 
@@ -288,7 +288,7 @@ export default function Contact() {
                   )}
                 </button>
                 {submitStatus === "error" && (
-                  <p className="text-sm text-red-400">{submitError}</p>
+                  <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>
                 )}
               </form>
             </motion.div>
@@ -300,13 +300,13 @@ export default function Contact() {
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
-        className="text-center mt-20 pt-8 border-t border-white/10"
+        className="text-center mt-20 pt-8 border-t border-fg/10"
       >
-        <p className="text-gray-400">
+        <p className="text-fg/65">
           Designed & Built by{" "}
           <span className="gradient-text font-semibold">Aditya Paruchuri</span>
         </p>
-        <p className="text-gray-500 text-sm mt-2">
+        <p className="text-fg/60 text-sm mt-2">
           &copy; {new Date().getFullYear()} All rights reserved.
         </p>
       </motion.div>

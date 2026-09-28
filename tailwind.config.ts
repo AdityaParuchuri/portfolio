@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,15 +10,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Theme "ink" color (light text on dark, dark text on light). Use
+        // opacity modifiers for muted levels, e.g. text-fg/65, bg-fg/10.
+        fg: "rgb(var(--fg-rgb) / <alpha-value>)",
+        // These accent vars are comma-separated ("95, 134, 201") because
+        // rgba(var(--x), a) and SpotlightGrid's parser rely on that, so they
+        // must use rgba() here, not the space-separated `rgb(... / a)` form.
         primary: {
-          light: "rgb(var(--accent-primary-rgb) / 0.85)",
-          DEFAULT: "rgb(var(--accent-primary-rgb) / 1)",
-          dark: "rgb(var(--accent-primary-rgb) / 0.75)",
+          light: "rgba(var(--accent-primary-rgb), 0.85)",
+          DEFAULT: "rgba(var(--accent-primary-rgb), 1)",
+          dark: "rgba(var(--accent-primary-rgb), 0.75)",
         },
         accent: {
-          light: "rgb(var(--accent-secondary-rgb) / 0.9)",
-          DEFAULT: "rgb(var(--accent-secondary-rgb) / 1)",
-          dark: "rgb(var(--accent-secondary-rgb) / 0.75)",
+          light: "rgba(var(--accent-secondary-rgb), 0.9)",
+          DEFAULT: "rgba(var(--accent-secondary-rgb), 1)",
+          dark: "rgba(var(--accent-secondary-rgb), 0.75)",
         },
       },
       animation: {

@@ -22,6 +22,8 @@ interface FakeRow {
   region: string | null;
   visitor_hash: string;
   referrer: string | null;
+  asn: number | null;
+  as_organization: string | null;
 }
 
 function createFakeDb(rows: FakeRow[] = []) {
@@ -32,16 +34,29 @@ function createFakeDb(rows: FakeRow[] = []) {
           return {
             async run() {
               if (query.startsWith("INSERT")) {
-                const [visited_at, path, country, city, region, visitor_hash, referrer] = values as [
-                  string,
-                  string,
-                  string | null,
-                  string | null,
-                  string | null,
-                  string,
-                  string | null
-                ];
-                rows.push({ visited_at, path, country, city, region, visitor_hash, referrer });
+                const [visited_at, path, country, city, region, visitor_hash, referrer, asn, as_organization] =
+                  values as [
+                    string,
+                    string,
+                    string | null,
+                    string | null,
+                    string | null,
+                    string,
+                    string | null,
+                    number | null,
+                    string | null
+                  ];
+                rows.push({
+                  visited_at,
+                  path,
+                  country,
+                  city,
+                  region,
+                  visitor_hash,
+                  referrer,
+                  asn,
+                  as_organization,
+                });
               } else if (query.startsWith("DELETE")) {
                 const [cutoff] = values as [string];
                 for (let i = rows.length - 1; i >= 0; i--) {
@@ -115,6 +130,23 @@ describe("logVisit (fake kv/db)", () => {
     expect(rows[0].referrer).toBeNull();
   });
 
+  it("records the ASN and network organization when provided", async () => {
+    const kv = createFakeKv();
+    const { db, rows } = createFakeDb();
+
+    await logVisit({
+      db,
+      kv,
+      ip: "1.2.3.4",
+      salt: "salt",
+      path: "/",
+      geo: { asn: 15169, asOrganization: "Google LLC" },
+      now,
+    });
+
+    expect(rows[0]).toMatchObject({ asn: 15169, as_organization: "Google LLC" });
+  });
+
   it("skips a second visit from the same ip on the same day", async () => {
     const kv = createFakeKv();
     const { db, rows } = createFakeDb();
@@ -150,7 +182,17 @@ describe("logVisit (fake kv/db)", () => {
     const kv = createFakeKv();
     const staleDate = new Date(now.getTime() - 91 * 24 * 60 * 60 * 1000).toISOString();
     const { db, rows } = createFakeDb([
-      { visited_at: staleDate, path: "/", country: null, city: null, region: null, visitor_hash: "old", referrer: null },
+      {
+        visited_at: staleDate,
+        path: "/",
+        country: null,
+        city: null,
+        region: null,
+        visitor_hash: "old",
+        referrer: null,
+        asn: null,
+        as_organization: null,
+      },
     ]);
 
     await logVisit({ db, kv, ip: "1.2.3.4", salt: "salt", path: "/", now });
@@ -170,7 +212,7 @@ describe("logVisit (real Cloudflare bindings)", () => {
       ip,
       salt: "test-salt",
       path: "/",
-      geo: { country: "US", city: "Boston", region: "MA" },
+      geo: { country: "US", city: "Boston", region: "MA", asn: 15169, asOrganization: "Google LLC" },
       referrer: "https://google.com/search",
       now,
     });
@@ -189,6 +231,8 @@ describe("logVisit (real Cloudflare bindings)", () => {
       city: "Boston",
       region: "MA",
       referrer: "https://google.com/search",
+      asn: 15169,
+      as_organization: "Google LLC",
     });
   });
 });

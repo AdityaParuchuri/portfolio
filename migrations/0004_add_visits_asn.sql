@@ -1,0 +1,2 @@
+ALTER TABLE visits ADD COLUMN asn INTEGER;
+ALTER TABLE visits ADD COLUMN as_organization TEXT;
