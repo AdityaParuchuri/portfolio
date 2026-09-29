@@ -65,6 +65,23 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: "Pocket Remote",
+    description:
+      "A phone remote for your Mac that turns any phone into a trackpad, keyboard, and media/volume controller over local WiFi, with zero apps to install — scan a QR code from npx pocket-remote and go.",
+    tags: [
+      "Node.js",
+      "WebSocket",
+      "JXA",
+      "Vanilla JS",
+      "PWA",
+      "npm",
+    ],
+    githubUrl: "https://github.com/AdityaParuchuri/pocket-remote",
+    liveUrl: "https://www.npmjs.com/package/pocket-remote",
+    image: "/images/project-5.png",
+    size: "large",
+  },
+  {
     title: "Prior Authorization Engine",
     description:
       "Backend prior authorization engine that ingests FHIR patient data, normalizes it, and uses a rule-based system to evaluate treatment eligibility and identify missing clinical requirements.",
